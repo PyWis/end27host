@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% block content %}<h1>Amministratori</h1>
+<div class="box" style="margin-bottom:24px"><form class="f row" method="post"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<input type="email" name="email" placeholder="email nuovo admin" required style="flex:1"><button class="btn">Crea e invia password</button></form>
+<p class="desc">Viene generata una password casuale e inviata via Brevo; al primo accesso verrà richiesto di cambiarla.</p></div>
+<table><tr><th>Email</th><th>Ruolo</th><th>Stato</th><th></th></tr>
+{% for u in users %}<tr><td>{{ u.email }}</td><td>{{ 'Superadmin' if u.is_superadmin else 'Admin' }}</td>
+<td>{{ 'Deve cambiare password' if u.must_change else 'Attivo' }}</td><td class="row">
+{% if not u.is_superadmin %}
+<form method="post" action="{{ url_for('admin.admin_reset', uid=u.id) }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn sm sec">Reinvia password</button></form>
+<form method="post" action="{{ url_for('admin.admin_delete', uid=u.id) }}" onsubmit="return confirm('Eliminare?')"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn sm danger">Elimina</button></form>
+{% endif %}</td></tr>{% endfor %}</table>
+<div class="box" style="margin-top:32px"><h2>Backup database</h2>
+<p class="desc">Scarica una copia del database (pagine, prodotti, ordini, link). I backup restano anche in <code>instance/backups</code> (ultimi {{ cfg.BACKUP_KEEP }}). Le immagini sono in <code>app/static/uploads</code>.</p>
+<form method="post" action="{{ url_for('admin.backup') }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn sec">Crea e scarica backup</button></form></div>{% endblock %}

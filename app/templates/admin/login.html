@@ -1,0 +1,6 @@
+{% extends "admin/base.html" %}
+{% block content %}<div class="box narrow"><h2>Accesso</h2>
+<form class="f" method="post"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label>Email</label><input type="email" name="email" required autofocus>
+<label>Password</label><input type="password" name="password" required>
+<p><button class="btn">Entra</button></p></form></div>{% endblock %}

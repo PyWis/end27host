@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block head %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+{% block body_class %}admin{% endblock %}
+{% block nav %}<nav class="main">
+{% if g.user and not g.user.must_change %}
+<a href="{{ url_for('admin.dashboard') }}">Pagine</a>
+<a href="{{ url_for('admin.home_settings') }}">Home &amp; SEO</a>
+<a href="{{ url_for('admin.orders') }}">Ordini</a>
+<a href="{{ url_for('admin.paylinks') }}">Link pagamento</a>
+{% if g.user.is_superadmin %}<a href="{{ url_for('admin.admins') }}">Admin</a>{% endif %}
+<a href="{{ url_for('admin.change_credentials') }}">Account</a>
+{% endif %}
+{% if g.user %}<form method="post" action="{{ url_for('admin.logout') }}" class="inline"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="navbtn">Esci</button></form>{% endif %}
+</nav>{% endblock %}
+{% block footer %}{% endblock %}

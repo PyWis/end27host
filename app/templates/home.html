@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ home.seo_title }}{% endblock %}
+{% block body_class %}home{% endblock %}
+{% block description %}{{ home.seo_description }}{% endblock %}
+{% block og_image %}{% set og = url_for('static', filename='uploads/' + home.og_image) if home.og_image else site_img('og-home') %}{% if og %}<meta property="og:image" content="{{ cfg.SITE_URL }}{{ og }}">{% endif %}{% endblock %}
+{% block head %}
+{% if home.noindex == '1' %}<meta name="robots" content="noindex,nofollow">{% endif %}
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org", "@type": "Organization",
+  "name": cfg.COMPANY_NAME or cfg.SITE_NAME, "url": cfg.SITE_URL,
+  "logo": (cfg.SITE_URL ~ site_img('logo')) if site_img('logo') else None,
+  "email": cfg.COMPANY_EMAIL or None, "vatID": cfg.COMPANY_VAT or None
+}|tojson }}</script>
+{% endblock %}
+{% block main %}
+{% set hero = site_img('hero') %}
+<section class="hero{{ ' has-img' if hero }}"{% if hero %} style="--hero-img:url('{{ hero }}')"{% endif %}><div class="wrap">
+<p class="eyebrow">{{ home.hero_eyebrow }}</p>
+<h1>{{ home.hero_title }}</h1>
+<p class="sub">{{ home.hero_subtitle }}</p>
+<div class="row"><a class="btn" href="#aree">Scopri le soluzioni</a>
+{% if cfg.BOOKING_URL %}<a class="btn ghost" href="{{ url_for('public.book_general') }}">Hai un progetto? Parliamone</a>{% endif %}</div>
+</div></section>
+
+<section class="section gray"><div class="wrap split">
+<div class="terminal" aria-hidden="true"><div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>endurance.sh</span></div>
+<pre><span class="c"># Il nostro metodo, in poche righe</span>
+<span class="k">obiettivo</span>   = <span class="s">"risultati misurabili"</span>
+<span class="k">team</span>        = <span class="s">"professionisti senior"</span>
+<span class="k">trasparenza</span> = <span class="n">100</span>   <span class="c"># prezzi chiari, online</span>
+<span class="k">sprechi</span>     = <span class="n">0</span>     <span class="c"># solo ciò che serve</span>
+<span class="c"># Avvio progetto... ▍</span></pre></div>
+<div><p class="eyebrow">Il nostro modello</p>
+<h2>Competenze vere, al prezzo giusto.</h2>
+<p class="lead">Niente pacchetti gonfiati e niente intermediari: ogni proposta ha un prezzo chiaro e un risultato concreto. Acquisti online in pochi clic oppure, per i progetti su misura, ne parliamo prima in una call.</p>
+<div class="callout">Lavoriamo da remoto con processi strutturati: un servizio di fascia alta, senza i costi di una grande agenzia. <b>Zero sprechi, massimo impatto.</b></div>
+</div></div></section>
+
+<section class="section ice center" id="aree"><div class="wrap">
+<p class="eyebrow">Cosa facciamo</p>
+<h2>Quattro aree, un solo partner.</h2>
+<p class="lead">Che tu stia avviando un progetto o voglia far crescere quello che hai, partiamo da dove sei tu.</p>
+<div class="areas">
+{% for key, a in menu.items() %}{% set ico, txt = AREA_INFO[key] %}{% set aimg = site_img('area-' ~ key) %}
+<a class="area-card" href="{{ url_for('public.area', area=key) }}">
+<span class="ico">{% if aimg %}<img src="{{ aimg }}" alt="" loading="lazy">{% else %}{{ ico }}{% endif %}</span>
+<h3>{{ a.label }}</h3><p>{{ txt }}</p>
+<span class="count">{% if a.pages %}{{ a.pages|length }} {{ 'proposta' if a.pages|length == 1 else 'proposte' }} →{% else %}In arrivo{% endif %}</span></a>
+{% endfor %}
+</div></div></section>
+
+{% if featured %}
+<section class="section teal"><div class="wrap">
+<p class="eyebrow">In evidenza</p>
+<h2>Le proposte più richieste.</h2>
+<p class="lead">Pronte da acquistare online, con pagamento sicuro Stripe.</p>
+<div class="grid" style="--cols:{{ [featured|length, 3]|min if featured|length > 1 else 3 }}">
+{% for it in featured %}
+<a class="gcard" href="{{ item_url(it) }}">
+{% if it.image %}<img src="{{ url_for('static', filename='uploads/' + it.image) }}" alt="{{ it.name }}" loading="lazy">{% endif %}
+<span><span class="badge">{{ AREAS[it.area_key] }}</span></span>
+<h3>{{ it.name }}</h3><p>{{ it.description|truncate(130) }}</p>
+<div class="price">€ {{ it.price }}</div><span class="btn">Scopri</span></a>
+{% endfor %}</div></div></section>
+{% endif %}
+
+<section class="section center"><div class="wrap">
+<p class="eyebrow">Come funziona</p>
+<h2>Dall'idea al risultato, in tre passi.</h2>
+<div class="steps" style="text-align:left">
+<div class="step"><h3>Scegli</h3><p>Esplora le aree e trova la proposta adatta: prezzi e contenuti sono chiari fin da subito.</p></div>
+<div class="step"><h3>Acquista o parliamone</h3><p>Paghi online in sicurezza oppure prenoti una call gratuita per un progetto su misura.</p></div>
+<div class="step"><h3>Si parte</h3><p>Ricevi la conferma via email e il nostro team ti contatta per avviare il lavoro.</p></div>
+</div></div></section>
+
+{% if cfg.BOOKING_URL %}
+<section class="section" style="padding-top:0"><div class="wrap">
+<div class="cta-band"><div><h2>Hai un progetto in mente?</h2><p>Prenota una call gratuita di 30 minuti: capiamo insieme da dove partire.</p></div>
+<a class="btn" href="{{ url_for('public.book_general') }}">Prenota la call</a></div>
+</div></section>
+{% endif %}
+{% endblock %}

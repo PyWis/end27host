@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="row" style="justify-content:space-between"><h1>Home &amp; SEO</h1><a class="btn sec" href="{{ url_for('public.home') }}" target="_blank">Vedi home</a></div>
+<div class="box"><form class="f" method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<fieldset><legend>SEO della home</legend>
+<label>Titolo (tag &lt;title&gt;, consigliati max 60 caratteri) <span class="note" data-count="seo_title"></span></label>
+<input name="seo_title" id="seo_title" value="{{ home.seo_title }}" maxlength="120">
+<label>Meta description (consigliati 120–160 caratteri) <span class="note" data-count="seo_description"></span></label>
+<textarea name="seo_description" id="seo_description" rows="3" maxlength="300">{{ home.seo_description }}</textarea>
+<p class="note" style="margin-top:14px">Anteprima su Google:</p>
+<div style="border:1px solid var(--gray-200);border-radius:12px;padding:14px 18px;margin-top:6px;font-family:Arial,sans-serif;max-width:620px">
+<div style="font-size:12px;color:#4d5156">{{ cfg.SITE_URL }}</div>
+<div id="pv_t" style="font-size:20px;color:#1a0dab;line-height:1.3;margin:2px 0"></div>
+<div id="pv_d" style="font-size:14px;color:#4d5156"></div></div>
+<label>Immagine per la condivisione social (Open Graph, 1200×630 px)</label>
+<input type="file" name="og_image" accept="image/*">
+{% if home.og_image %}<img class="admin-thumb" src="{{ url_for('static', filename='uploads/' + home.og_image) }}" alt="">
+<label><input type="checkbox" name="og_remove"> Rimuovi immagine</label>
+{% elif site_img('og-home') %}<p class="note">In uso: <code>static/img/og-home</code> (caricane una qui per sostituirla).</p>{% endif %}
+<label><input type="checkbox" name="noindex" {{ 'checked' if home.noindex == '1' }}> Nascondi la home ai motori di ricerca (noindex) — usalo solo in fase di test</label>
+</fieldset>
+<fieldset><legend>Testi della sezione principale</legend>
+<label>Occhiello (piccolo testo sopra il titolo)</label><input name="hero_eyebrow" value="{{ home.hero_eyebrow }}" maxlength="60">
+<label>Titolo (H1)</label><input name="hero_title" value="{{ home.hero_title }}" maxlength="120">
+<label>Sottotitolo</label><textarea name="hero_subtitle" rows="3" maxlength="300">{{ home.hero_subtitle }}</textarea>
+<p class="note">Lascia un campo vuoto per ripristinare il testo predefinito.</p>
+</fieldset>
+<p style="margin-top:20px"><button class="btn">Salva</button></p></form></div>
+<script>
+const T=document.getElementById('seo_title'),D=document.getElementById('seo_description');
+function up(){document.getElementById('pv_t').textContent=T.value.length>60?T.value.slice(0,58)+'…':T.value;
+document.getElementById('pv_d').textContent=D.value.length>160?D.value.slice(0,157)+'…':D.value;
+document.querySelectorAll('[data-count]').forEach(e=>{const v=document.getElementById(e.dataset.count).value.length,max=e.dataset.count==='seo_title'?60:160;e.textContent='· '+v+'/'+max;e.style.color=v>max?'var(--err)':''})}
+T.oninput=D.oninput=up;up();
+</script>
+{% endblock %}

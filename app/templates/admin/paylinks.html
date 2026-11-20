@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>Link di pagamento</h1>
+<p class="desc">Dopo la call di vendita crea un link personale: il cliente paga con Stripe il prezzo concordato, anche per prodotti con call obbligatoria o non pubblici.</p>
+{% if created %}{% set url = cfg.SITE_URL ~ url_for('public.paylink', token=created.token) %}
+<div class="box" style="margin-bottom:24px"><b>Link creato:</b>
+<div class="row" style="margin-top:8px"><input id="newlink" value="{{ url }}" readonly style="flex:1"><button class="btn sm" type="button" onclick="navigator.clipboard.writeText(document.getElementById('newlink').value);this.textContent='Copiato'">Copia</button></div></div>
+{% endif %}
+<div class="box"><form class="f" method="post"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label>Prodotto</label><select name="item" id="item" required><option value="">— scegli —</option>
+{% for v, label, price in items %}<option value="{{ v }}" data-price="{{ price }}">{{ label }} (€ {{ price }})</option>{% endfor %}</select>
+<label>Prezzo concordato (€, vuoto = prezzo di listino)</label><input name="price" id="price" placeholder="es. 1.200,00">
+<label>Email cliente (consigliata: precompila il pagamento)</label><input type="email" name="customer_email">
+<label>Nota per il cliente (opzionale)</label><textarea name="note" rows="2"></textarea>
+<label>Validità (giorni)</label><input type="number" name="days" min="1" max="60" value="{{ cfg.PAYLINK_DAYS }}">
+<label><input type="checkbox" name="send" checked> Invia il link via email al cliente (Brevo)</label>
+<p><button class="btn">Crea link</button></p></form></div>
+<h2 style="margin-top:32px">Link creati</h2>
+<div class="scroll"><table><tr><th>Creato</th><th>Prodotto</th><th>Importo</th><th>Cliente</th><th>Scade</th><th>Stato</th><th></th></tr>
+{% for l in links %}<tr><td>{{ l.created_at.strftime('%d/%m/%Y') }}<br><small class="desc">{{ l.created_by }}</small></td><td>{{ l.item_name }}</td><td>€ {{ l.amount }}</td><td>{{ l.customer_email or '—' }}</td>
+<td>{{ l.expires_at.strftime('%d/%m/%Y') }}</td><td><span class="tag {{ 'on' if l.status=='pagato' else 'off' if l.status=='scaduto' }}">{{ l.status }}</span></td>
+<td class="row">{% if l.status == 'attivo' %}<button class="btn sm sec" type="button" onclick="navigator.clipboard.writeText('{{ cfg.SITE_URL }}{{ url_for('public.paylink', token=l.token) }}');this.textContent='Copiato'">Copia link</button>
+<form method="post" action="{{ url_for('admin.paylink_cancel', lid=l.id) }}" onsubmit="return confirm('Annullare il link?')"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn sm danger">Annulla</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="desc">Nessun link.</td></tr>{% endfor %}</table></div>
+{% endblock %}

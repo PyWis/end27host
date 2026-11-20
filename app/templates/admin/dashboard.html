@@ -1,0 +1,11 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="row" style="justify-content:space-between"><h1>Pagine</h1><a class="btn" href="{{ url_for('admin.page_new') }}">+ Nuova pagina</a></div>
+<div class="scroll"><table><tr><th>Titolo</th><th>Area</th><th>Tipo</th><th>Stato</th><th></th></tr>
+{% for p in pages %}<tr><td>{{ p.title }}{% if p.featured %} <span class="tag">★ evidenza</span>{% endif %}</td><td>{{ AREAS[p.area] }}</td><td>{{ 'Monoprodotto' if p.kind=='mono' else 'Pluriprodotto' }}</td>
+<td><span class="tag {{ 'on' if p.is_visible else 'off' }}">{{ 'Nel menu' if p.is_visible else ('Senza prodotti attivi' if p.is_active else 'Non attiva') }}</span></td>
+<td class="row"><a class="btn sm sec" href="{{ url_for('admin.page_edit', pid=p.id) }}">Modifica</a>
+<a class="btn sm sec" href="{{ url_for('public.page', area=p.area, slug=p.slug) }}" target="_blank">{{ 'Vedi' if p.is_visible else 'Anteprima' }}</a>
+<form method="post" action="{{ url_for('admin.page_duplicate', pid=p.id) }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn sm sec">Duplica</button></form></td></tr>
+{% else %}<tr><td colspan="5" class="desc">Nessuna pagina.</td></tr>{% endfor %}</table></div>
+{% endblock %}

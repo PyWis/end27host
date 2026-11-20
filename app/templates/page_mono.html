@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ cfg.SITE_NAME }}{% endblock %}
+{% block description %}{{ page.description or cfg.SITE_DESCRIPTION }}{% endblock %}
+{% block og_image %}{% with img = page.image %}{% include "_og.html" %}{% endwith %}{% endblock %}
+{% block content %}
+{% include "_preview.html" %}
+<div class="page-head"><p class="eyebrow">{{ AREAS[page.area] }}</p><h1>{{ page.title }}</h1></div>
+<div class="mono">
+{% if page.image %}<div class="img"><img src="{{ url_for('static', filename='uploads/' + page.image) }}" alt="{{ page.title }}"></div>{% endif %}
+<div class="txt">
+<p class="desc">{{ page.description }}</p>
+<div class="price">€ {{ page.price }}</div>
+{% with item = page, action = url_for('public.checkout_page', page_id=page.id) %}{% include "_buy.html" %}{% endwith %}
+{% if page.expires_at %}<p class="desc">Disponibile fino al {{ page.expires_at.strftime('%d/%m/%Y %H:%M') }}</p>{% endif %}
+</div></div>
+{% endblock %}

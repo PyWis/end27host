@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ cfg.SITE_NAME }}{% endblock %}
+{% block description %}{{ page.description or cfg.SITE_DESCRIPTION }}{% endblock %}
+{% block og_image %}{% with img = page.image or (products[0].image if products else None) %}{% include "_og.html" %}{% endwith %}{% endblock %}
+{% block content %}
+{% include "_preview.html" %}
+<div class="page-head"><p class="eyebrow">{{ AREAS[page.area] }}</p><h1>{{ page.title }}</h1>
+<p class="desc lead">{{ page.description }}</p></div>
+<div class="grid" style="--cols:{{ page.columns }}">
+{% for p in products %}
+<div class="card" id="prod-{{ p.id }}"><h3>{{ p.name }}{% if preview and not p.is_active %} <span class="tag off">non attivo</span>{% endif %}</h3><p class="desc">{{ p.description }}</p>
+{% if p.image %}<img src="{{ url_for('static', filename='uploads/' + p.image) }}" alt="{{ p.name }}" loading="lazy">{% endif %}
+<div class="price">€ {{ p.price }}</div>
+{% with item = p, action = url_for('public.checkout', product_id=p.id) %}{% include "_buy.html" %}{% endwith %}</div>
+{% endfor %}</div>
+{% endblock %}

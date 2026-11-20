@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="row" style="justify-content:space-between"><h1>Ordini</h1><a class="btn sec" href="{{ url_for('admin.orders_csv') }}">Esporta CSV</a></div>
+<p class="desc">{{ n_paid }} ordini pagati · incasso totale <b>€ {{ total }}</b> (al netto degli sconti, prima delle commissioni Stripe).</p>
+<div class="row" style="margin:12px 0">{% for k, l in [('paid','Pagati'), ('pending','In attesa'), ('expired','Scaduti'), ('all','Tutti')] %}
+<a class="btn sm {{ '' if status==k else 'sec' }}" href="{{ url_for('admin.orders', stato=k) }}">{{ l }}</a>{% endfor %}</div>
+<div class="scroll"><table><tr><th>N.</th><th>Data</th><th>Prodotto</th><th>Q.tà</th><th>Totale</th><th>Cliente</th><th>Stato</th></tr>
+{% for o in orders %}<tr><td>{{ o.id }}</td><td>{{ (o.paid_at or o.created_at).strftime('%d/%m/%Y %H:%M') }}</td>
+<td>{{ o.item_name }}{% if o.paylink_id %} <span class="tag">da link</span>{% endif %}</td><td>{{ o.quantity }}</td><td>€ {{ o.amount }}</td>
+<td>{{ o.customer_name }}{% if o.customer_email %}<br><a href="mailto:{{ o.customer_email }}">{{ o.customer_email }}</a>{% endif %}</td>
+<td><span class="tag {{ 'on' if o.status=='paid' else 'off' if o.status=='expired' }}">{{ {'paid':'Pagato','pending':'In attesa','expired':'Scaduto'}[o.status] }}</span>{% if o.status=='paid' and not o.email_sent %} <span class="tag off" title="Conferma non inviata (Brevo o email mancante)">no email</span>{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="desc">Nessun ordine.</td></tr>{% endfor %}</table></div>
+{% if not cfg.STRIPE_WEBHOOK_SECRET %}<p class="note" style="margin-top:16px">⚠ STRIPE_WEBHOOK_SECRET non impostato: gli ordini vengono confermati solo quando il cliente torna sulla pagina «Grazie». Configura il webhook su Stripe verso <code>{{ cfg.SITE_URL }}{{ url_for('public.stripe_webhook') }}</code>.</p>{% endif %}
+{% endblock %}

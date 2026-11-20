@@ -1,0 +1,2 @@
+Immagini della grafica (facoltative: se mancano il sito usa sfondi a gradiente).
+Vedi README, sezione «Immagini».

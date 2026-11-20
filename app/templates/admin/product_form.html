@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>{{ 'Modifica prodotto' if prod else 'Nuovo prodotto' }} <small class="desc">— {{ page.title }}</small></h1>
+<div class="box"><form class="f" method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label>Nome</label><input name="name" value="{{ prod.name if prod }}" required>
+<label>Descrizione</label><textarea name="description" rows="5">{{ prod.description if prod }}</textarea>
+<label>Prezzo (€)</label><input name="price" value="{{ prod.price if prod }}" placeholder="es. 99,00" required>
+<label>Immagine</label><input type="file" name="image" accept="image/*">
+{% if prod and prod.image %}<p><img src="{{ url_for('static', filename='uploads/' + prod.image) }}" style="max-width:180px;border-radius:8px"></p>{% endif %}
+{% with obj = prod %}{% include "admin/_sell_fields.html" %}{% endwith %}
+<label>Scadenza (vuoto = nessuna)</label><input type="datetime-local" name="expires_at" value="{{ prod.expires_at.strftime('%Y-%m-%dT%H:%M') if prod and prod.expires_at }}">
+<label><input type="checkbox" name="enabled" {{ 'checked' if (not prod) or prod.enabled }}> Attivo</label>
+<p><button class="btn">Salva</button> <a class="btn sec" href="{{ url_for('admin.page_edit', pid=page.id) }}">Annulla</a></p></form></div>
+{% endblock %}

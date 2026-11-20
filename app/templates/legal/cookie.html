@@ -1,0 +1,14 @@
+{% extends "legal/_base.html" %}
+{% block doc %}
+<h2>Cookie usati da questo sito</h2>
+<p>Il sito usa un solo cookie <b>tecnico</b>, necessario al funzionamento: <code>session</code> (sessione del browser), che protegge i moduli da invii fraudolenti (CSRF) e mantiene l'accesso dell'area riservata. Per i cookie tecnici non è richiesto il consenso (art. 122 Codice Privacy, Linee guida Garante del 10 giugno 2021).</p>
+<p>Non usiamo cookie di profilazione né strumenti di statistica di terze parti.</p>
+<h2>Servizi di terze parti</h2>
+<ul>
+<li><b>Stripe</b>: il pagamento avviene sulle pagine di Stripe, che usa propri cookie tecnici e antifrode. <a href="https://stripe.com/it/cookie-settings" rel="noopener" target="_blank">Informativa Stripe</a>.</li>
+<li><b>Google Calendar</b>: il calendario di prenotazione viene caricato solo se premi «Mostra il calendario» o apri il link di Google; da quel momento si applicano i cookie di Google. <a href="https://policies.google.com/technologies/cookies?hl=it" rel="noopener" target="_blank">Informativa Google</a>.</li>
+</ul>
+<h2>Come gestire i cookie</h2>
+<p>Puoi cancellare o bloccare i cookie dalle impostazioni del browser; bloccando il cookie tecnico alcuni moduli del sito potrebbero non funzionare.</p>
+<p>Per domande: {{ mail }}.</p>
+{% endblock %}

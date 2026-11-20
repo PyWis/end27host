@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Grazie · {{ cfg.SITE_NAME }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}<div class="err-page">
+<p class="eyebrow">Ordine ricevuto</p><h1 style="color:var(--navy)">Grazie!</h1>
+{% if order %}
+<p>Il pagamento per <b>{{ order.item_name }}</b>{% if order.quantity > 1 %} × {{ order.quantity }}{% endif %} (€ {{ order.amount }}) è stato completato.
+Ordine n. {{ order.id }}{% if order.customer_email %}: la conferma è stata inviata a {{ order.customer_email }}{% endif %}.</p>
+{% if show_call %}
+<p style="margin-top:24px">Vuoi fissare subito una call con il nostro team?</p>
+<p><a class="btn" href="{{ url_for('public.book', kind=item.item_kind, item_id=item.id) }}">Prenota la call</a></p>
+{% endif %}
+{% else %}
+<p>Se hai completato il pagamento riceverai a breve la conferma via email.</p>
+{% endif %}
+</div>{% endblock %}

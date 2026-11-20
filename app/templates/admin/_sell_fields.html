@@ -1,0 +1,7 @@
+{# Campi di vendita comuni. Variabile: obj (Page mono o Product, oppure None) #}
+<label>Quantità massima per ordine (1 = nessuna scelta)</label><input type="number" name="max_quantity" min="1" max="999" value="{{ obj.max_quantity if obj else 1 }}">
+<label>Prenotazione call di vendita</label><select name="call_mode">{% for k, l in CALL_MODES.items() %}<option value="{{ k }}" {{ 'selected' if obj and obj.call_mode==k }}>{{ l }}</option>{% endfor %}</select>
+<label>Link prenotazione specifico (opzionale, altrimenti quello dell'area o globale da .env)</label><input type="url" name="booking_override" placeholder="https://calendar.google.com/calendar/appointments/schedules/..." value="{{ obj.booking_override if obj and obj.booking_override }}">
+{% if not ANY_BOOKING %}<p class="note">⚠ GOOGLE_CALENDAR_BOOKING_URL non è impostato in .env: senza un link specifico il pulsante di prenotazione non comparirà.</p>{% endif %}
+<p class="note">Con «call obbligatoria» il cliente non può pagare dal sito: dopo la call crei un link da <b>Link pagamento</b>.</p>
+<label><input type="checkbox" name="featured" {{ 'checked' if obj and obj.featured }}> In evidenza in home page</label>

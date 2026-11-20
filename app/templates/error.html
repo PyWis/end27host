@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}Errore {{ code }} · Endurance 2027{% endblock %}
+{% block content %}<div class="err-page"><h1>{{ code }}</h1><p class="lead" style="margin:0 auto">{{ message }}</p>
+<p style="margin-top:24px"><a class="btn sec" href="{{ url_for('public.home') }}">Torna alla home</a></p></div>{% endblock %}

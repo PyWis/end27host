@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Prenota una call{% if item %} · {{ item.name }}{% endif %} · {{ cfg.SITE_NAME }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="page-head"><p class="eyebrow">Parliamone</p><h1>Prenota una call</h1>
+{% if item %}
+<p class="lead">Per: <b>{{ item.name }}</b> (€ {{ item.price }}).
+{% if item.call_mode == 'required' %}Durante la call definiamo i dettagli: subito dopo riceverai un link di pagamento personale.{% else %}La call è facoltativa: puoi anche <a href="{{ item_url(item) }}">acquistare subito</a>.{% endif %}</p>
+{% else %}
+<p class="lead">Raccontaci il tuo progetto: scegli giorno e ora, ti richiamiamo noi. Nessun impegno.</p>
+{% endif %}</div>
+{% if embed %}
+{# l'iframe di Google si carica solo dopo il clic: nessun cookie di terze parti senza azione dell'utente #}
+<div class="booking-wrap" id="bw"><p>Il calendario delle disponibilità è fornito da Google Calendar: caricandolo, Google può impostare i propri cookie (<a href="{{ url_for('public.legal', doc='cookie') }}">cookie policy</a>).</p>
+<button class="btn" type="button" onclick="var f=document.createElement('iframe');f.className='booking';f.title='Calendario prenotazioni';f.src=this.dataset.src;document.getElementById('bw').replaceWith(f)" data-src="{{ embed }}">Mostra il calendario</button></div>
+<p class="note">Oppure <a href="{{ booking_url }}" target="_blank" rel="noopener">apri il calendario su Google</a>.</p>
+{% else %}
+<p><a class="btn" href="{{ booking_url }}" target="_blank" rel="noopener">Scegli data e ora su Google Calendar</a></p>
+{% endif %}
+<p style="margin-top:24px"><a href="{{ item_url(item) if item else url_for('public.home') }}">← {{ 'Torna al prodotto' if item else 'Torna alla home' }}</a></p>
+{% endblock %}

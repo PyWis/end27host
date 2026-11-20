@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="row" style="justify-content:space-between"><h1>{{ 'Modifica pagina' if page else 'Nuova pagina' }}</h1>
+{% if page and page.id %}<a class="btn sec" href="{{ url_for('public.page', area=page.area, slug=page.slug) }}" target="_blank">{{ 'Vedi pagina' if page.is_visible else 'Anteprima' }}</a>{% endif %}</div>
+<div class="box"><form class="f" method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label>Area</label><select name="area">{% for k, l in AREAS.items() %}<option value="{{ k }}" {{ 'selected' if page and page.area==k }}>{{ l }}</option>{% endfor %}</select>
+<label>Tipo di pagina</label><select name="kind" id="kind" {{ 'disabled' if page and page.id }}>
+<option value="mono" {{ 'selected' if page and page.kind=='mono' }}>Monoprodotto</option>
+<option value="multi" {{ 'selected' if page and page.kind=='multi' }}>Pluriprodotto</option></select>
+{% if page and page.id %}<input type="hidden" name="kind" value="{{ page.kind }}">{% endif %}
+<label>Titolo</label><input name="title" value="{{ page.title if page }}" required>
+<label>Indirizzo (slug, opzionale)</label><input name="slug" value="{{ page.slug if page }}">
+<label>Descrizione (usata anche per Google e anteprime social)</label><textarea name="description" rows="5">{{ page.description if page }}</textarea>
+<label>Immagine {{ '(anteprima social della raccolta)' if page and page.kind=='multi' else '' }}</label><input type="file" name="image" accept="image/*">
+{% if page and page.image %}<p><img src="{{ url_for('static', filename='uploads/' + page.image) }}" style="max-width:180px;border-radius:8px"></p>{% endif %}
+<div id="mono"><label>Prezzo (€)</label><input name="price" value="{{ page.price if page and page.price_cents else '' }}" placeholder="es. 1.500,00">
+{% with obj = page %}{% include "admin/_sell_fields.html" %}{% endwith %}</div>
+<label>Scadenza (vuoto = nessuna)</label><input type="datetime-local" name="expires_at" value="{{ page.expires_at.strftime('%Y-%m-%dT%H:%M') if page and page.expires_at }}">
+<label><input type="checkbox" name="enabled" {{ 'checked' if (not page) or page.enabled }}> Attiva (visibile nel menu)</label>
+<div id="cols"><label>Colonne griglia (3-5, solo pluriprodotto)</label><input type="number" name="columns" min="3" max="5" value="{{ page.columns if page else 3 }}"></div>
+<p><button class="btn">Salva</button></p></form></div>
+{% if page and page.id and page.kind=='multi' %}
+<div class="row" style="justify-content:space-between;margin-top:32px" id="prodotti"><h2>Prodotti della griglia</h2>
+<a class="btn" href="{{ url_for('admin.product_edit', pid=page.id) }}">+ Aggiungi prodotto</a></div>
+<div class="scroll"><table><tr><th>Ordine</th><th>Nome</th><th>Prezzo</th><th>Call</th><th>Scadenza</th><th>Stato</th><th></th></tr>
+{% for p in page.products %}{% set first, last = loop.first, loop.last %}<tr>
+<td class="row">{% for d, lab in [('su', '↑'), ('giu', '↓')] %}<form method="post" action="{{ url_for('admin.product_move', prid=p.id, direction=d) }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn sm sec" {{ 'disabled' if (d=='su' and first) or (d=='giu' and last) }} title="Sposta {{ d }}">{{ lab }}</button></form>{% endfor %}</td>
+<td>{{ p.name }}{% if p.featured %} <span class="tag">★</span>{% endif %}</td><td>€ {{ p.price }}</td><td>{{ {'none':'—','optional':'Facoltativa','required':'Obbligatoria'}[p.call_mode] }}</td><td>{{ p.expires_at.strftime('%d/%m/%Y %H:%M') if p.expires_at else '—' }}</td>
+<td><span class="tag {{ 'on' if p.is_active else 'off' }}">{{ 'Attivo' if p.is_active else ('Scaduto' if p.enabled else 'Disattivato') }}</span></td>
+<td class="row"><a class="btn sm sec" href="{{ url_for('admin.product_edit', prid=p.id) }}">Modifica</a>
+<form method="post" action="{{ url_for('admin.product_delete', prid=p.id) }}" onsubmit="return confirm('Eliminare?')"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn sm danger">Elimina</button></form></td></tr>
+{% else %}<tr><td colspan="7" class="desc">Nessun prodotto: finché non ne aggiungi uno attivo la raccolta non compare nel menu.</td></tr>{% endfor %}</table></div>
+{% endif %}
+{% if page and page.id %}
+<form method="post" action="{{ url_for('admin.page_delete', pid=page.id) }}" onsubmit="return confirm('Eliminare pagina e prodotti?')" style="margin-top:32px"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="btn danger">Elimina pagina</button></form>
+{% endif %}
+<script>const k=document.getElementById('kind'),c=document.getElementById('cols'),m=document.getElementById('mono');function t(){c.style.display=k.value==='multi'?'block':'none';m.style.display=k.value==='mono'?'block':'none'}k.onchange=t;t();</script>
+{% endblock %}
